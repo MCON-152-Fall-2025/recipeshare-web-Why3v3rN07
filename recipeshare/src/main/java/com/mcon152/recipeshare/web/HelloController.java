@@ -11,6 +11,6 @@ public class HelloController {
         return "Welcome to RecipeShare!";
     }
 
-    @GetMapping("/hello")
+    @GetMapping("/hello") //so when tou navigate to http://localhost:8080/hello, it sends this request
     public String hello() { return "RecipeShare is up!"; }
 }
