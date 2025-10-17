@@ -1,6 +1,8 @@
 package com.mcon152.recipeshare.web;
 
 import com.mcon152.recipeshare.Recipe;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -45,14 +47,15 @@ public class RecipeController {
      * @return the recipe with the specified ID, or null if not found
      */
     @GetMapping("/{id}")
-    public Recipe getRecipeById(@PathVariable long id) {
-        for (Recipe recipe : recipes) {
-            if (recipe.getId() == id) {
-                return recipe;
+    public ResponseEntity<Recipe> getRecipe(@PathVariable long id) {
+        for (Recipe r : recipes) {
+            if (r.getId() == id) {
+                return ResponseEntity.ok(r);
             }
         }
-        return null;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
 
     /**
      * Deletes a recipe by its ID.
@@ -61,14 +64,14 @@ public class RecipeController {
      * @return true if the recipe was deleted, false if not found
      */
     @DeleteMapping("/{id}")
-    public boolean deleteRecipe(@PathVariable long id) {
+    public ResponseEntity<Recipe> deleteRecipe(@PathVariable long id) {
         for (int i = 0; i < recipes.size(); i++) {
             if (recipes.get(i).getId() == id) {
                 recipes.remove(i);
-                return true;
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             }
         }
-        return false;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     /**
      * Updates an existing recipe by its ID.
@@ -78,8 +81,14 @@ public class RecipeController {
      * @return the updated recipe, or null if not found
      */
     @PutMapping("/{id}")
-    public Recipe updateRecipe(@PathVariable long id, @RequestBody Recipe updatedRecipe) {
-        throw new UnsupportedOperationException("Update recipe not implemented");
+    public ResponseEntity<Recipe> putRecipe(@PathVariable long id, @RequestBody Recipe updatedRecipe) {
+        for (int i = 0; i < recipes.size(); i++) {
+            if (recipes.get(i).getId() == id) {
+                recipes.set(i, updatedRecipe);
+                return ResponseEntity.ok(recipes.get(i));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
@@ -90,7 +99,17 @@ public class RecipeController {
      * @return the updated recipe, or null if not found
      */
     @PatchMapping("/{id}")
-    public Recipe patchRecipe(@PathVariable long id, @RequestBody Recipe partialRecipe) {
-        throw new UnsupportedOperationException("Update recipe not implemented");
+    public ResponseEntity<Recipe> patchRecipe(@PathVariable long id, @RequestBody Recipe partialRecipe) {
+        for (Recipe recipe : recipes) {
+            if (recipe.getId() == id) {
+                if (partialRecipe.getId() != null) recipe.setId(partialRecipe.getId());
+                if (partialRecipe.getTitle() != null) recipe.setTitle(partialRecipe.getTitle());
+                if (partialRecipe.getDescription() != null) recipe.setDescription(partialRecipe.getDescription());
+                if (partialRecipe.getIngredients() != null) recipe.setIngredients(partialRecipe.getIngredients());
+                if (partialRecipe.getInstructions() != null) recipe.setInstructions(partialRecipe.getInstructions());
+                return ResponseEntity.ok(recipe);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }
